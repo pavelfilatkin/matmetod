@@ -1,0 +1,72 @@
+# Функция для ввода данных пользователем с клавиатуры
+def reading_entering(n):
+    matrix = []
+    for i in range(n):
+        temp = []
+        for j in range(n):
+            temp.append(int(input('введите элемент матрицы ')))
+        matrix.append(temp)
+    return matrix
+
+
+# Функция для случайной генерации весовой матрицы
+def reading_random(border, nrows):
+    import numpy as np
+    matrix = np.random.randint(border, size=(nrows, nrows))
+    return matrix
+
+print('Выберите способ задания весовой матрицы')
+print('1. Ввод с клавиатуры')
+print('2. Рандомная матрица')
+type = int(input('Введите способ задания матрицы, выбрав соответствующий номер '))
+
+if type == 1:
+    n = int(input('введите количество стратегий игроков '))
+    matrix_a = reading_entering(n)
+    matrix_b = reading_entering(n)
+    print('Ваша матрица A - ')
+    for i in range(n):
+        print(matrix_a[i])
+    print('Ваша матрица B - ')
+    for i in range(n):
+        print(matrix_b[i])
+elif type == 2:
+    bord = int(input('введите верхнюю границу ограничения промежутка '))
+    n = int(input('введите количество стратегий игроков '))
+    matrix_a = reading_random(bord, n)
+    matrix_b = reading_random(bord, n)
+    print('Ваша матрица A - ', matrix_a)
+    print('Ваша матрица B - ', matrix_b)
+else:
+    print('ошибка! неверный выбор')
+
+def strat_entering(n):
+    strategy = []
+    for i in range(n):
+        strategy.append(str(input('Введите стратегии игрока ')))
+    return strategy
+
+for i in range(2):
+    player = int(input('Введите название игрока, для которого сейчас будете вводить стратегии (1 если игрок А, 2 если игрок В) '))
+    if player == 1:
+        strategy_a = strat_entering(n)
+    else:
+        strategy_b = strat_entering(n)
+
+
+print('Стратегии игрока А - ',strategy_a)
+print('Стратегии игрока В - ',strategy_b)
+
+import numpy as np
+matrix_b_90 = np.rot90(matrix_b, 1)
+
+import nashpy as nash
+
+P1=np.array(matrix_a)
+P2=np.array(matrix_b_90)
+prisoner_dilemma=nash.Game(P1,P2)
+k = prisoner_dilemma.support_enumeration()
+for i in k:
+    print(i)
+
+print(prisoner_dilemma)
