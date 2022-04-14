@@ -1,0 +1,78 @@
+# Функция для ввода данных пользователем с клавиатуры
+def reading_entering (n,m):
+    matrix = []
+    for i in range(n):
+        temp = []
+        for j in range (m):
+            temp.append(float(input('enter the number of matrix ')))
+        matrix.append(temp)
+    return matrix
+
+# Функция для случайной генерации весовой матрицы
+def reading_random (border, nrows, ncols):
+    import numpy as np
+    matrix = np.random.randint(border, size = (nrows, ncols))
+    return matrix
+
+print('Выберите способ задания весовой матрицы')
+print('1. Ввод с клавиатуры')
+print('2. Рандомная матрица')
+type = int(input('Введите способ задания матрицы, выбрав соответствующий номер '))
+
+if type == 1:
+    n = int(input('введите количество строк в матрице '))
+    m = int(input('введите количество столбцов в матрице '))
+    matrix = reading_entering(n,m)
+    print('Ваша матрица - ', matrix)
+elif type == 2:
+    bord = int(input('введите верхнюю границу ограничения промежутка '))
+    n = int(input('введите количество строк в матрице '))
+    m = int(input('введите количество столбцов в матрице '))
+    matrix = reading_random(bord,n,m)
+    print('Ваша матрица - ',matrix)
+else:
+    print('ошибка! неверный выбор')
+
+###### Алгоритм Дейкстра
+import math
+def arg_min(T, S):
+    amin = -1
+    m = math.inf  # максимальное значение
+    for i, t in enumerate(T):
+        if t < m and i not in S:
+            m = t
+            amin = i
+
+    return amin
+
+N = len(matrix)  # число вершин в графе
+T = [math.inf]*N   # последняя строка таблицы
+
+v = 0       # стартовая вершина (нумерация с нуля)
+S = {v}     # просмотренные вершины
+T[v] = 0    # нулевой вес для стартовой вершины
+M = [0]*N   # оптимальные связи между вершинами
+
+while v != -1:          # цикл, пока не просмотрим все вершины
+    for j, dw in enumerate(matrix[v]):   # перебираем все связанные вершины с вершиной v
+        if j not in S:           # если вершина еще не просмотрена
+            w = T[v] + dw
+            if w < T[j]:
+                T[j] = w
+                M[j] = v        # связываем вершину j с вершиной v
+
+    v = arg_min(T, S)            # выбираем следующий узел с наименьшим весом
+    if v >= 0:                    # выбрана очередная вершина
+        S.add(v)                 # добавляем новую вершину в рассмотрение
+
+#print(T, M, sep="\n")
+
+# формирование оптимального маршрута:
+start = 0
+end = 4
+P = [end]
+while end != start:
+    end = M[P[-1]]
+    P.append(end)
+
+print(P)
