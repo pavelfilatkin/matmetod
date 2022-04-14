@@ -1,0 +1,53 @@
+from cvxopt.modeling import variable, op
+import time
+start = time.time()
+x = variable(6, 'x')
+c= [1,2,3,4,3,2]
+z=(c[0]*x[0] + c[1]*x[1] +c[2]* x[2] +c[3]*x[3] + c[4]*x[4] +c[5]* x[5])
+mass1 = (x[0] + x[1] +x[2] == 60)
+mass2 = (x[3] + x[4] +x[5] == 80)
+mass3 = (x[0] + x[3] == 35)
+mass4 = (x[1] + x[4] == 50)
+mass5 = (x[2] +x[5] == 55)
+x_non_negative = (x >= 0)
+problem =op(z,[mass1,mass2,mass3,mass4 ,mass5,x_non_negative])
+problem.solve(solver='glpk')
+print('Целевая функция:')
+print('c[0]*x[0] + c[1]*x[1] +c[2]* x[2] +c[3]*x[3] + c[4]*x[4] +c[5]* x[5] => max')
+print("Оптимальный план перевозок:")
+
+matrix = []
+for i in x.value:
+         matrix.append(i)
+print(matrix[0],matrix[1],matrix[2])
+print(matrix[3],matrix[4],matrix[5])
+
+print("Стоимость доставки:")
+print(problem.objective.value()[0])
+
+
+import matplotlib.pyplot as plt
+import numpy as np
+
+x1 = np.arange(-10,38,0.02)
+y1 = (35 - x1)/4
+y2 = (50 - 2*x1)/3
+y3 = (55 - 3*x1)/2
+
+fig = plt.figure()
+
+graph1 = plt.plot([0.0, 70.0], [0.0, 0.0],color = 'k')
+graph2 = plt.plot([0.0, 0.0], [0.0, 70.0],color = 'k')
+graph3 = plt.plot(x1,y1,color = 'r')
+graph4 = plt.plot(x1,y2,color = 'blue')
+graph5 = plt.plot(x1,y3, color = 'orange')
+
+grid1 = plt.grid(True)
+
+plt.xlabel('x1')
+plt.ylabel('x2')
+plt.title('Решение транспортной задачи')
+text1 = plt.text(40.0,52.0,'x2 = (35 - x1)/4',color = 'r')
+text1 = plt.text(40.0,47.0,'x2 = (50 - 2x1)/3',color = 'blue')
+text1 = plt.text(40.0,42.0,'x2 = (55 - 3x1)/2',color = 'orange')
+plt.show()
