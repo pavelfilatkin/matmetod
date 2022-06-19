@@ -1,0 +1,94 @@
+import math
+######## Количество клиентов за время t
+N1 = 8 # утро
+N2 = 12 # день
+N3 = 15 # вечер
+####### Время
+t = 30
+######## Входной поток для промежутков
+lambda1 = N1/t
+lambda2 = N2/t
+lambda3 = N3/t
+######### Время обслуживания одного клиента в определенный промежуток
+T1 = 2
+T2 = 4
+T3 = 6
+########## Выходной поток для промежутков
+nu1 = 1/T1
+nu2 = 1/T2
+nu3 = 1/T3
+######### Нагруженность системы в определенный промежуток
+p1 = lambda1/nu1
+p2 = lambda2/nu2
+p3 = lambda3/nu3
+n = 2 #колво касс
+m = 6 # макс длина очереди
+k = [0,1,2,3,4,5,6,7,8]
+############ Состояния системы утром
+vspom1 = []
+for i in range(3):
+    vspom1.append(p1 ** k[i]/math.factorial(k[i]))
+
+for i in range(3,9):
+    vspom1.append(p1 ** k[i]/(n**(k[i] - n) * math.factorial(n)))
+
+p01 = sum(vspom1) ** (-1)
+
+P1 = []
+for i in range(1,len(vspom1)):
+    P1.append(round(vspom1[i] * p01,2))
+
+############ Состояния системы днем
+vspom2 = []
+for i in range(3):
+    vspom2.append(p2 ** k[i]/math.factorial(k[i]))
+
+for i in range(3,9):
+    vspom2.append(p2 ** k[i]/(n**(k[i] - n) * math.factorial(n)))
+
+p02 = sum(vspom2) ** (-1)
+
+P2 = []
+for i in range(1,len(vspom2)):
+    P2.append(round(vspom2[i] * p02,2))
+
+############ Состояния системы вечером
+vspom3 = []
+for i in range(3):
+    vspom3.append(p3 ** k[i]/math.factorial(k[i]))
+
+for i in range(3,9):
+    vspom3.append(p3 ** k[i]/(n**(k[i] - n) * math.factorial(n)))
+
+p03 = sum(vspom3) ** (-1)
+
+P3 = []
+for i in range(1,len(vspom3)):
+    P3.append(round(vspom3[i] * p03,2))
+
+############# Характеристики для клиента
+## Вероятность отказа в обслуживании
+p_otk = [P1[-1],P2[-1],P3[-1]]
+
+## Вероятность встать в очередь
+p_och = [sum(P1[2:7]),round(sum(P2[2:7]),2),sum(P3[2:7])]
+
+## Средняя длина очереди
+L_och = [round((p1 ** (n + 1)) * (1-(p1/n)**m * (m + 1 - m * p1/n)) * p01 / (n * math.factorial(n) * (1 - p1/n)**2),3),round((p2 ** (n + 1)) * (1-(p2/n)**m * (m + 1 - m * p2/n)) * p02 / (n * math.factorial(n) * (1 - p2/n)**2),3),round((p3 ** (n + 1)) * (1-(p3/n)**m * (m + 1 - m * p3/n)) * p03 / (n * math.factorial(n) * (1 - p3/n)**2),3)]
+
+## Среднее время ожидания в очереди
+T_och = [L_och[0]/(lambda1 * (1-p_otk[0])),L_och[1]/(lambda2 * (1-p_otk[1])),L_och[2]/(lambda3 * (1-p_otk[2]))]
+
+######### Характеристики для владельца
+##Абсолютная пропускная способность
+A = [lambda1*(1-p_otk[0]),lambda2*(1-p_otk[1]),lambda3*(1-p_otk[2])]
+
+## Относительная пропускная способность
+Q = [1-p_otk[0],1-p_otk[1],1-p_otk[2]]
+
+##Среднее кол-во занятых касс
+n_zan = [A[0]/nu1,A[1]/nu2,A[2]/nu3]
+
+## Коэффициент простоя касс
+K_pr = [1-n_zan[0]/n,1-n_zan[1]/n,1-n_zan[2]/n]
+print(K_pr)
