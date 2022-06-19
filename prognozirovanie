@@ -1,0 +1,125 @@
+import csv
+road = str(input('Введите путь к файлу (без кавычек) '))
+with open(road, encoding='utf-8') as r_file:
+    file_reader = csv.reader(r_file, delimiter = ";",quoting=csv.QUOTE_NONE)
+    l=[]
+    for i in file_reader:
+        #print(i)
+        l.append(i)
+for i in l:
+    i[0]=int(i[0])
+    i[1]=int(i[1])
+print(l)
+
+
+import numpy as np
+import matplotlib.pyplot as plt
+
+N = len(l) # число экспериментов
+k = 2
+b = 3
+
+print(N)
+
+f = np.array([k*z+b for z in range(N*10)])
+
+
+x = []
+y = []
+for i in l:
+    x.append(i[0])
+    y.append(i[1])
+print(x)
+print(y)
+
+x = np.array(x)
+y = np.array(y)
+
+# вычисляем коэффициенты
+mx = x.sum()/N
+my = y.sum()/N
+a2 = np.dot(x.T, x)/N
+a11 = np.dot(x.T, y)/N
+
+kk = (a11 - mx*my)/(a2 - mx**2)
+bb = my - kk*mx
+ff = np.array([kk*z+bb for z in range(N*15)])
+
+print('Теоретическое значение коэффициента k = ',kk)
+print('Теоретическое значение коэффициента b = ',bb)
+
+plt.scatter(x, y, s=2, c='red')
+plt.plot(f, c = 'green')
+plt.plot(ff, c='blue')
+plt.grid(True)
+plt.show() 
+
+import numpy as np
+import matplotlib.pyplot as plt
+%matplotlib inline
+from scipy import linalg
+def my_quadratic_function(x):
+    return x**2 - 3*x - 10
+
+xx = []
+yy = []
+for i in l:
+    xx.append(i[0])
+    yy.append(i[1])
+    
+plt.scatter(xx, yy)
+
+m = len(l)
+x = np.random.rand(m)
+y = my_quadratic_function(x) + 0.05*np.random.randn(m)
+
+plt.plot(x, y, 'o')
+X = np.stack((np.ones(m), x, x**2)).T
+beta, _, _, _ = linalg.lstsq(X, y)
+beta0, beta1, beta2 = beta
+beta
+
+plt.plot(xx, my_quadratic_function(xx), label = 'Original')
+plt.plot(x, y, 'o', label = 'Data')
+plt.plot(xx, beta0 + beta1*xx + beta2*xx**2, label = 'Restored')
+plt.legend()
+plt.grid()
+
+beta = np.polyfit(x, y, 2)
+beta
+
+
+import matplotlib.pyplot as plt
+from scipy.optimize import curve_fit
+import numpy as np
+import math
+
+x = []
+y = []
+for i in l:
+    x.append(i[0])
+    y.append(i[1])
+    
+xx = np.array(x)
+yy = np.array(y)
+
+#квадратная функция (парабола)
+def my_quadratic_function(x,a,b,c):
+    return a*x**2 + b*x + c #a=1, b=-3, c=-10
+
+#полуокружность
+def half_circle(x,R):
+    c = R**2 - x**2
+    d = math.sqrt(c)
+    return d #R=1150
+
+popt, pcov = curve_fit(my_quadratic_function, xx, yy)    
+a,b,c = popt
+
+print('a={0}\nb={1}\nc={2}'.format(*tuple(popt)))
+
+#print('R={0}'.format(*tuple(popt)))
+
+plt.scatter(xx,yy,s=30,color='red')
+plt.plot(xx, my_quadratic_function(xx, *popt))
+plt.grid()
