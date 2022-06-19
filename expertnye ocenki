@@ -1,0 +1,117 @@
+import pandas as pd
+import scipy.stats as sps
+import numpy as np
+import matplotlib.pyplot as plt
+import math
+import statistics
+
+
+# In[12]:
+
+
+df = pd.read_excel("F:\ПРЕДМЕТЫ\МАТМЕТОДЫ/xx.xlsx",usecols="K,N,Q,T,W,Z")
+df.columns=['cena','ploshad','rasst','godp','vnv','etazh']
+mat_o=[]
+disp=[]
+std_o=[]
+lev_d=[]
+prav_d=[]
+for i in df.columns:
+    mat_o.append(np.array(df[i].tolist()).mean())
+    disp.append(np.array(df[i].tolist()).var())
+    std_o.append(np.array(df[i].tolist()).std())
+    lev_d.append(np.array(df[i].tolist()).mean()-np.array(df[i].tolist()).std())
+    prav_d.append(np.array(df[i].tolist()).mean()+np.array(df[i].tolist()).std())
+
+
+# In[13]:
+
+
+def plot_confidence_interval(x, values, color='orange', horizontal_line_width=0.25):
+    mean = np.array(values).mean()
+    stdev = np.array(values).std()
+
+    left = x - horizontal_line_width / 2
+    top = mean - stdev
+    right = x + horizontal_line_width / 2
+    bottom = mean + stdev
+    plt.plot([x, x], [top, bottom], color=color,linewidth=15)
+    plt.plot([left, right], [top, top], color=color,linewidth=5)
+    plt.plot([left, right], [bottom, bottom], color=color,linewidth=5)
+    plt.plot(x, mean, 'D', color='purple',ms=13)
+
+    return mean
+plt.figure(figsize=(10.0,10.0))
+plt.xticks([1,2,3,4,5,6],['Цена', 'Площадь', 'Расстояние', 'Год',"Вид","Этаж"])
+plt.title('Доверительный интервал')
+plot_confidence_interval(1, df['cena'].tolist())
+plot_confidence_interval(2, df['ploshad'].tolist())
+plot_confidence_interval(3, df['rasst'].tolist())
+plot_confidence_interval(4, df['godp'].tolist())
+plot_confidence_interval(5, df['vnv'].tolist())
+plot_confidence_interval(6, df['etazh'].tolist())
+
+plt.show()
+
+
+# In[4]:
+
+
+df = pd.read_excel("F:\ПРЕДМЕТЫ\МАТМЕТОДЫ/xx.xlsx",usecols="H")
+s={'Цена':[],'Внешний вид квартиры':[],'Расстояние до метро':[],'Этаж':[],'Год постройки дома':[],'Площадь (кв.м.)':[]}
+df.columns=['poryadok']
+for i in range(len(df)):
+    a=df.loc[i].at['poryadok'].split(';')
+    for j in a:
+        if j in s.keys():
+            s[j].append(a.index(j))
+med_r=[]
+for i in s.keys():
+    med_r.append(statistics.median(s[i]))  
+print("Цена:",med_r[0],'Внешний вид',med_r[1],'Расстояние до метро',med_r[2],'Этаж',med_r[3],
+      'Год постройки',med_r[4],'Площадь',med_r[5],sep='\n')
+print('Медиана рангов: ',med_r)
+sred_vzv=[]
+for i in s.values():
+    sred_vzv.append(statistics.mean(i))
+b=[]
+bb=[]
+for j in range(len(df)):
+    for i in s.values():
+        b.append(i[j])
+    for x in range(len(b)):
+        l=[]
+        a=(b[x]-sred_vzv[x])**2
+        l.append(a)
+    bb.append(1/(sum(l)/(len(b)-1)))
+    b=[]
+sumbb=sum(bb)
+k=[]
+for i in bb:
+    k.append(i/sumbb)
+SRV=[]
+for i in s.values():
+    SRV.append(np.sum(np.array(i) * np.array(k)))
+print('Метод средневзвешанных рангов: ',SRV)
+    
+
+
+# In[93]:
+
+
+df = pd.read_excel("F:\ПРЕДМЕТЫ\МАТМЕТОДЫ/xx.xlsx",usecols="A,AC,AF,AI,AL,AO,AR,AU,AX,BA,BD,BG,BJ,BM,BP,BS")
+s=dict()
+df.columns=['id','1','2','3','4','5','6','7','8','9','10','11','12','13','14','15']
+
+for i in range(len(df)):
+    a=df.loc[i].at['id']
+    s[a]=[]
+for i in s.keys():
+    s[i]=np.diag([1,1,1,1,1,1])
+l=[]
+for j in range(len(df)):
+    d=[]
+    for i in df.columns[1:]:
+        x=int(df.loc[j].at[i].split()[-1])
+        d.append(x)
+    l.append(d)
