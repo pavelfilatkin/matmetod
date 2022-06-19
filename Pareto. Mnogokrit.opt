@@ -1,0 +1,27 @@
+def pareto_frontier(Xs, Ys, maxX = True, maxY = True):
+# Sort the list in either ascending or descending order of X
+    myList = sorted([[Xs[i], Ys[i]] for i in range(len(Xs))], reverse=maxX)
+# Start the Pareto frontier with the first value in the sorted list
+    p_front = [myList[0]]    
+# Loop through the sorted list
+    for pair in myList[1:]:
+        if maxY: 
+            if pair[1] >= p_front[-1][1]: # Look for higher values of Y…
+                p_front.append(pair) # … and add them to the Pareto frontier
+        else:
+            if pair[1] <= p_front[-1][1]: # Look for lower values of Y…
+                p_front.append(pair) # … and add them to the Pareto frontier
+# Turn resulting pairs back into a list of Xs and Ys
+    p_frontX = [pair[0] for pair in p_front]
+    p_frontY = [pair[1] for pair in p_front]
+    return p_frontX, p_frontY
+import matplotlib.pyplot as plt   
+Xs, Ys = [270,270,150,210,265,300,320,199],[140,100,120,150,130,160,180,200]
+p_front = pareto_frontier(Xs, Ys, maxX = False, maxY = True) 
+# Plot a scatter graph of all results
+plt.scatter(Xs, Ys)
+# Then plot the Pareto frontier on top
+plt.plot(p_front[0], p_front[1])
+plt.show()
+print('Первая точка: ',p_front[0][0],p_front[1][0])
+print('Вторая точка: ',p_front[0][1],p_front[1][1])
